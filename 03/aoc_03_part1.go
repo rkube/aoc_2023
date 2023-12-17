@@ -150,7 +150,7 @@ func match_gears(g text_loc, numbers []text_loc) int {
 }
 
 func main() {
-	fmt.Println("Advent of code 2023 - Project 2")
+	fmt.Println("Advent of code 2023 - Project 3")
 	// Input has 140 lines, each 140 characters.
 	f, err := os.Open("input_03")
 	if err != nil {
