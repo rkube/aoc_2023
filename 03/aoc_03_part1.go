@@ -56,28 +56,31 @@ func parse_numbers(linenr int, line string) ([]text_loc, bool) {
 	c_state := false
 	for ix := 0; ix < len(line); ix++ {
 		// fmt.Printf("%d: %c\n", ix, line[ix])
+		// If we are not parsing a number, better start it and record.
 		if char_in_string(rune(line[ix]), "0123456789") {
-			// Check if the previous token is a '.'. In that case we are starting to parse a number
-			if (ix > 0) && char_in_string(rune(line[ix-1]), "#$%&*+-/=@.") {
+			// fmt.Printf("%d: case 1", ix)
+			if c_state == false {
+				// fmt.Printf(" start parsing")
 				c_state = true
-
-				fmt.Printf("before: len(number_locs) = %d\n", len(number_locs))
 				number_locs = append(number_locs, text_loc{linenr, ix, -1})
-				fmt.Printf("after: len(number_locs) = %d\n", len(number_locs))
 			}
-			if (ix < 139) && char_in_string(rune(line[ix+1]), "#$%&*+-/=@.") {
+			// fmt.Printf("\n")
+		} // If the next token is either a '.' or a special character, stop parsing
+		if (ix < 139) && char_in_string(rune(line[ix+1]), "#$%&*+-/=@.") {
+			if c_state == true {
 				c_state = false
 				ix_s := len(number_locs)
-				fmt.Printf("ix_s = %d\n", ix_s)
-				number_locs[ix_s-1].col_end = ix + 1
-
-				// We just closed a number. Print it to terminal
-				for cix := number_locs[ix_s-1].col_start; cix < number_locs[ix_s-1].col_end; cix++ {
-					fmt.Printf("%d: %c\n", cix, line[cix])
-				}
+				// fmt.Printf("ix_s = %d\n", ix_s)
+				number_locs[ix_s-1].col_end = ix
 			}
 		}
+		if (ix == 139) && c_state == true {
+			ix_s := len(number_locs)
+			// fmt.Printf("ix_s = %d\n", ix_s)
+			number_locs[ix_s-1].col_end = ix
+		}
 	}
+
 	return number_locs, c_state
 }
 
@@ -96,15 +99,15 @@ func main() {
 
 		symbol_loc := parse_symbols(linenr, current_line)
 		number_loc, s := parse_numbers(linenr, current_line)
-		fmt.Printf("%d: len(symbols)=%d, len(numbers)=%d, s=%d\n", linenr, len(symbol_loc), len(number_loc), s)
+		fmt.Printf("line %d: len(symbols)=%d, len(numbers)=%d, s=%d\n", linenr, len(symbol_loc), len(number_loc), s)
 		for ix_n, n := range number_loc {
-			fmt.Printf("%d: %s\n", ix_n, current_line[n.col_start:n.col_end])
+			fmt.Printf("%d [%d:%d]: %s\n", ix_n, n.col_start, n.col_end, current_line[n.col_start:n.col_end+1])
 		}
 
 		linenr += 1
-		if linenr > 1 {
-			break
-		}
+		// if linenr > 10 {
+		// 	break
+		// }
 	}
 
 	// remember to close the file at the end of the program
