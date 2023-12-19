@@ -78,7 +78,7 @@ func (list *LinkedList) Display() {
 	fmt.Println()
 }
 
-// Parse the seed list
+// Parse the seed list as individual seed numbers
 // Format: seeds: 304740406 53203352...
 func parse_seeds(line string, seeds []int) {
 	line_cropped := line[7:]
@@ -91,7 +91,6 @@ func parse_seeds(line string, seeds []int) {
 		}
 		seeds[ix_s] = this_seed
 	}
-	// return seeds
 }
 
 // Parse a string like 0 1 2 into a src_dst_map
@@ -135,15 +134,10 @@ func main() {
 		// Seeds are listed in line 0. Store them in an integer slice
 		if ix_line == 0 {
 			parse_seeds(current_line, seeds)
-			// seed_parsed = true
-			for ix_s, s := range seeds {
-				fmt.Printf("[%02d]:%d\n", ix_s, s)
-			}
 		} else if ix_line > 2 && ix_line < 15 {
 			// Parse the range from a string into a src_to_dst_map and append in the linked list
 			// which describes the mapping.
 			new_map := parse_map_str(current_line)
-			fmt.Printf("start: [%d] -> [%d], length: %d\n", new_map.src_start, new_map.dst_start, new_map.len)
 			seed_to_soil_map.Insert(*new_map)
 		} else if ix_line > 16 && ix_line < 38 {
 			// soil-to-fertilizer map is on lines 17-37
@@ -173,7 +167,7 @@ func main() {
 	seed_to_soil_map.Display()
 
 	// Map seeds to location
-	locations := make([]int, 20, 25)
+	locations := make([]int, len(seeds), len(seeds))
 	for ix_s, seed := range seeds {
 		ix_soil := seed_to_soil_map.rg_map(seed)
 		ix_fert := soil_to_fertilizer_map.rg_map(ix_soil)
@@ -183,18 +177,57 @@ func main() {
 		ix_humid := temperature_to_humidity_map.rg_map(ix_temp)
 		ix_loc := humidity_to_location_map.rg_map(ix_humid)
 		locations[ix_s] = ix_loc
-		fmt.Printf("[seed ] %d\n[fert ] %d\n[water] %d\n[light] %d\n[temp ] %d\n[humid] %d\n[locat] %d\n", seed, ix_fert, ix_water, ix_light, ix_temp, ix_humid, ix_loc)
 	}
 
 	// Find the minimum of all locations
-	min_loc := 4294967295
+	min_loc := 4294967295 // = 2^32-1
 	for _, loc := range locations {
-		fmt.Printf("%d\n", loc)
 		if loc < min_loc {
 			min_loc = loc
 		}
 	}
-	fmt.Printf("Minimum location: %d\n", min_loc)
+	// Correct answer: 993500720
+	fmt.Printf("Part 1 - Minimum location: %d\n", min_loc)
+
+	// For part 2 we need to re-interpret the seeds to construct a set of ranges
+	// Even indices 0, 2, 4, ..., 18 are the start
+	//  Odd indices 1, 3, 5, ..., 19 are the length
+	// of the individual ranges.
+	// First create a new locations array that can store all outcome locations
+	len_seed_rg := 0
+	for ix_s := 1; ix_s < len(seeds); ix_s += 2 {
+		fmt.Printf("%d - %d\n", ix_s, seeds[ix_s])
+		len_seed_rg += seeds[ix_s]
+	}
+	fmt.Printf("Length of all seed ranges: %d\n", len_seed_rg)
+	locations_rg := make([]int, len_seed_rg, len_seed_rg)
+	// Now iterate again over the seeds, re-interpreted as ranges, and find the location for each
+	// seed in the range
+	ix_loc_rg := 0
+
+	for ix_s_rg := 0; ix_s_rg < len(seeds); ix_s_rg += 2 {
+		fmt.Printf("ix_s_rg = %d: [%10d - %10d]\n", ix_s_rg, seeds[ix_s_rg], seeds[ix_s_rg]+seeds[ix_s_rg+1])
+		for seed := seeds[ix_s_rg]; seed < seeds[ix_s_rg]+seeds[ix_s_rg+1]; seed++ {
+			ix_soil := seed_to_soil_map.rg_map(seed)
+			ix_fert := soil_to_fertilizer_map.rg_map(ix_soil)
+			ix_water := fertilizer_to_water_map.rg_map(ix_fert)
+			ix_light := water_to_light_map.rg_map(ix_water)
+			ix_temp := light_to_temperature_map.rg_map(ix_light)
+			ix_humid := temperature_to_humidity_map.rg_map(ix_temp)
+			ix_loc := humidity_to_location_map.rg_map(ix_humid)
+			locations_rg[ix_loc_rg] = ix_loc
+			ix_loc_rg += 1
+		}
+	}
+	// Find the minimum of all locations
+	min_loc = 4294967295 // = 2^32-1
+	for _, loc := range locations_rg {
+		if loc < min_loc {
+			min_loc = loc
+		}
+	}
+	// correct answer: 4917124
+	fmt.Printf("Part 2 - Minimum location: %d\n", min_loc)
 
 	defer f.Close()
 }
