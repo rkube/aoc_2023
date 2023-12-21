@@ -28,4 +28,16 @@ func main() {
 	fmt.Printf("Part 1: margin = %d\n", margin)
 
 	// Part 2
+	duration := 40709879
+	record_distance := 215105121471005
+	ways_to_beat_record := 0
+	for v := 0; v < duration; v++ {
+		remaining_time := duration - v
+		if v*remaining_time > record_distance {
+			// fmt.Printf("%d * %d = %d > %d\n", v, remaining_time, v*remaining_time, record_distance)
+			ways_to_beat_record += 1
+		}
+	}
+	fmt.Printf("Part 2: ways to beat record = %d\n", ways_to_beat_record)
+
 }
