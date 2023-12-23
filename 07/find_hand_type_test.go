@@ -75,6 +75,66 @@ func Test_full_house(t *testing.T) {
 	fmt.Printf("\tJokers=false\n")
 	for _, h := range test_cases {
 		hand := build_hand(h)
-		fmt.Printf("Full House for %s: %v\n", h, is_full_fouse(hand, false))
+		fmt.Printf("Full House for %s: %v\n", h, is_full_house(hand, false))
+	}
+}
+
+func Test_three_kind(t *testing.T) {
+	fmt.Printf("===== Testing Three of a kind\n")
+	test_cases := []string{"23456", "J89QA", "JA8J2", "JJJ21", "229T2"}
+	fmt.Printf("\tJokers=true\n")
+	for _, h := range test_cases {
+		hand := build_hand(h)
+		fmt.Printf("Full House for %s: %v\n", h, is_three_of_kind(hand, true))
+	}
+	fmt.Printf("\tJokers=false\n")
+	for _, h := range test_cases {
+		hand := build_hand(h)
+		fmt.Printf("Full House for %s: %v\n", h, is_three_of_kind(hand, false))
+	}
+}
+
+func Test_two_pair(t *testing.T) {
+	fmt.Printf("===== Testing Two Pairs\n")
+	test_cases := []string{"99J22", "77877", "JJ113", "AA442", "9K92K"}
+	fmt.Printf("\tJokers=true\n")
+	for _, h := range test_cases {
+		hand := build_hand(h)
+		fmt.Printf("Full House for %s: %v\n", h, is_two_pair(hand, true))
+	}
+	fmt.Printf("\tJokers=false\n")
+	for _, h := range test_cases {
+		hand := build_hand(h)
+		fmt.Printf("Full House for %s: %v\n", h, is_two_pair(hand, false))
+	}
+}
+
+func Test_one_pair(t *testing.T) {
+	fmt.Printf("===== Testing Two Pairs\n")
+	test_cases := []string{"2468T", "JKAJK", "TJK72"}
+	fmt.Printf("\tJokers=true\n")
+	for _, h := range test_cases {
+		hand := build_hand(h)
+		fmt.Printf("Full House for %s: %v\n", h, is_one_pair(hand, true))
+	}
+	fmt.Printf("\tJokers=false\n")
+	for _, h := range test_cases {
+		hand := build_hand(h)
+		fmt.Printf("Full House for %s: %v\n", h, is_one_pair(hand, false))
+	}
+}
+
+func Test_high_card(t *testing.T) {
+	fmt.Printf("===== Testing Two Pairs\n")
+	test_cases := []string{"2468T", "JKAJK", "TJK72", "AA29T"}
+	fmt.Printf("\tJokers=true\n")
+	for _, h := range test_cases {
+		hand := build_hand(h)
+		fmt.Printf("Full House for %s: %v\n", h, is_high_card(hand, true))
+	}
+	fmt.Printf("\tJokers=false\n")
+	for _, h := range test_cases {
+		hand := build_hand(h)
+		fmt.Printf("Full House for %s: %v\n", h, is_high_card(hand, false))
 	}
 }

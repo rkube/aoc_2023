@@ -117,18 +117,26 @@ func is_four_of_kind(h hand_bid, jokers bool) bool {
 
 // Test if we can get a Full House
 func is_full_house(h hand_bid, jokers bool) bool {
+	// fmt.Printf("\n\tis_full_house:")
 	max_count := do_max_count(h.hand, jokers)
 	if jokers {
 		num_jokers := h.hand[rune('J')]
+		// fmt.Printf("num_jokers=%d\n", num_jokers)
 		// 1st possiblity: 3 of kind, 2 of kind, no jokers
 		if num_jokers == 0 {
-			found_3 := false
-			found_2 := false
-			for _, val := range h.hand {
-				found_3 = val == 3
-				found_2 = val == 2
+			found_3 := 0
+			found_2 := 0
+			for _, count := range h.hand {
+				if count == 3 {
+					found_3 += 1
+				} else if count == 2 {
+					found_2 += 1
+				}
+				// fmt.Printf("%#U: count: %d, found_3=%d, found_2=%d\n", card, count, found_3, found_2)
+
 			}
-			return found_3 && found_2
+			// fmt.Printf("\tis_full_house: %s: found_3=%d found_2=%d\n", h.cards, found_3, found_2)
+			return (found_3 == 1) && (found_2 == 1)
 		} else if num_jokers == 1 {
 			// 2nd possibility: 2 pairs and 1 joker
 			num_twos := 0
@@ -138,8 +146,9 @@ func is_full_house(h hand_bid, jokers bool) bool {
 				}
 			}
 			return num_twos == 2
+		} else {
+			return false
 		}
-		return false
 	} else {
 		if max_count == 3 {
 			for _, v := range h.hand {
@@ -153,46 +162,65 @@ func is_full_house(h hand_bid, jokers bool) bool {
 	}
 }
 
-// Takes a hand and finds determine its type, i.e. 5 of a kind, 4 of a kind etc.
-func find_hand_type(h hand_bid, jokers bool) (hand_type, error) {
+func is_three_of_kind(h hand_bid, jokers bool) bool {
 	max_count := do_max_count(h.hand, jokers)
-	for _, v := range h.hand {
-		if v > max_count {
-			max_count = v
+	if jokers {
+		num_jokers := h.hand[rune('J')]
+		return num_jokers+max_count == 3
+	} else {
+		return max_count == 3
+	}
+}
+
+func is_two_pair(h hand_bid, jokers bool) bool {
+	found_2 := 0
+	for card, count := range h.hand {
+		if jokers && card == rune('J') {
+			continue
+		}
+		if count == 2 {
+			found_2 += 1
 		}
 	}
-	switch max_count {
-	case 5:
+	return found_2 == 2
+}
+
+func is_one_pair(h hand_bid, jokers bool) bool {
+	max_count := do_max_count(h.hand, jokers)
+	if jokers {
+		num_jokers := h.hand[rune('J')]
+		return num_jokers+max_count == 2
+
+	} else {
+		return max_count == 2
+	}
+}
+
+func is_high_card(h hand_bid, jokers bool) bool {
+	max_count := do_max_count(h.hand, jokers)
+	if jokers {
+		num_jokers := h.hand[rune('J')]
+		return num_jokers == 0
+	} else {
+		return max_count == 1
+	}
+
+}
+
+func find_hand_type(h hand_bid, jokers bool) (hand_type, error) {
+	if is_five_of_kind(h, jokers) {
 		return five_of_kind, nil
-	case 4:
+	} else if is_four_of_kind(h, jokers) {
 		return four_of_kind, nil
-	case 3:
-		// If we have 3 identical card we need to re-check if it's a full house or 3-of-kind
-		for _, v := range h.hand {
-			if v == 2 {
-				return full_house, nil
-			}
-		}
+	} else if is_full_house(h, jokers) {
+		return full_house, nil
+	} else if is_three_of_kind(h, jokers) {
 		return three_of_kind, nil
-	case 2:
-		// If max of type is 2, we need to check for another pair
-		rune_first_two := '0'
-		rune_second_two := '0'
-		for r, v := range h.hand {
-			if v == 2 && rune_first_two == '0' {
-				rune_first_two = r
-			} else if v == 2 && rune_first_two != '0' {
-				rune_second_two = r
-			}
-		}
-		// h.Display()
-		// fmt.Printf("First pair: %c\tSecond pair: %c\n", rune_first_two, rune_second_two)
-		if rune_second_two == '0' {
-			return one_pair, nil
-		} else {
-			return two_pair, nil
-		}
-	case 1:
+	} else if is_two_pair(h, jokers) {
+		return two_pair, nil
+	} else if is_one_pair(h, jokers) {
+		return one_pair, nil
+	} else if is_high_card(h, jokers) {
 		return high_card, nil
 	}
 	error_str := fmt.Sprintf("Could not find hand type for %s\n", h.cards)
@@ -274,8 +302,20 @@ func main() {
 		weighted_sum += all_hands_bids[order[ix]].bid * (ix + 1)
 		fmt.Printf("Hand: %s Bid: %d, order: %d\n", all_hands_bids[order[ix]].cards, all_hands_bids[order[ix]].bid, ix)
 	}
-	fmt.Printf("Sum of bids, weighted by order: %d\n", weighted_sum)
+	fmt.Printf("Sum of bids, weighted by order (Part 1): %d -- correct answer: 249638405\n", weighted_sum)
 
-	// 251362095 -- too high
-	// 249638405 -- correct answer :D
+	// Part 2 - use new joker rule
+	// Re-initialize the ordering
+	for ix := 0; ix < len(order); ix++ {
+		order[ix] = ix
+	}
+
+	bubble_sort(all_hands_bids, &order, true)
+
+	weighted_sum = 0
+	for ix := 0; ix < len(order); ix++ {
+		weighted_sum += all_hands_bids[order[ix]].bid * (ix + 1)
+		fmt.Printf("Hand: %s Bid: %d, order: %d\n", all_hands_bids[order[ix]].cards, all_hands_bids[order[ix]].bid, ix)
+	}
+	fmt.Printf("Sum of bids, weighted by order (Part 2): %d -- correct answer: 249776650\n", weighted_sum)
 }
