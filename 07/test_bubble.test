@@ -1,0 +1,43 @@
+// package bubble
+
+// import (
+// 	"fmt"
+// )
+
+// func bubble_sort(vals *[]int) {
+// 	N := len(*vals)
+// 	for {
+// 		swapped := false
+
+// 		for ix := 1; ix < N; ix++ {
+// 			if (*vals)[ix-1] > (*vals)[ix] {
+// 				tmp := (*vals)[ix]
+// 				(*vals)[ix] = (*vals)[ix-1]
+// 				(*vals)[ix-1] = tmp
+// 				swapped = true
+// 				fmt.Printf("swapped %d/%d\n", (*vals)[ix-1], (*vals)[ix])
+// 			}
+// 		}
+// 		if swapped == false {
+// 			break
+// 		}
+// 	}
+// }
+
+// func test(vals *[]int) {
+// 	tmp := (*vals)[0]
+// 	(*vals)[0] = (*vals)[1]
+// 	(*vals)[1] = tmp
+// }
+
+// func main() {
+// 	vals := []int{14, 13, 22, 16, 18, 17}
+// 	for ix := 0; ix < len(vals); ix++ {
+// 		fmt.Printf("%d - %d\n", ix, vals[ix])
+// 	}
+// 	bubble_sort(&vals)
+// 	fmt.Printf("============================\n")
+// 	for ix := 0; ix < len(vals); ix++ {
+// 		fmt.Printf("%d - %d\n", ix, vals[ix])
+// 	}
+// }
