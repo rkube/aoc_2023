@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -25,9 +26,12 @@ const (
 )
 
 // Maps card face values to numerical values for comparison
-func get_card_values() map[rune]int {
-	card_values := map[rune]int{'2': 0, '3': 1, '4': 2, '5': 3, '6': 4, '7': 5, '8': 6, '9': 7, 'T': 8, 'J': 9, 'Q': 10, 'K': 11, 'A': 12}
-	return card_values
+func get_card_values(jokers bool) map[rune]int {
+	if jokers == false {
+		return map[rune]int{'2': 0, '3': 1, '4': 2, '5': 3, '6': 4, '7': 5, '8': 6, '9': 7, 'T': 8, 'J': 9, 'Q': 10, 'K': 11, 'A': 12}
+	} else {
+		return map[rune]int{'J': 0, '2': 1, '3': 2, '4': 3, '5': 4, '6': 5, '7': 6, '8': 7, '9': 8, 'T': 9, 'Q': 10, 'K': 11, 'A': 12}
+	}
 }
 
 // This structure stores a hand together with a bid.
@@ -67,28 +71,109 @@ func parse_splits(hand_str string, bid int) hand_bid {
 	return new_hand_bid
 }
 
-// Takes a hand and finds determine its type, i.e. 5 of a kind, 4 of a kind etc.
-func find_hand_type(h hand_bid) hand_type {
+// Gets the highest occurance of a single card within a hand
+func do_max_count(hand map[rune]int, jokers bool) int {
 	max_count := 0
+	for card, v := range hand {
+		// Don't count Jokers for max_count
+		if card == rune('J') && jokers {
+			continue
+		}
+		if v > max_count {
+			max_count = v
+		}
+	}
+	return max_count
+}
+
+// Test if we can get five of kind
+func is_five_of_kind(h hand_bid, jokers bool) bool {
+	max_count := do_max_count(h.hand, jokers)
+	if jokers {
+		// See if we can form five of a kind with the number of jokers at hand
+		num_jokers := h.hand[rune('J')]
+		// Jokers and max count have to add up to 5
+		if num_jokers+max_count == 5 {
+			return true
+		} else {
+			return false
+		}
+	} else {
+		return max_count == 5
+	}
+}
+
+// Test if we can get four if kind
+func is_four_of_kind(h hand_bid, jokers bool) bool {
+	max_count := do_max_count(h.hand, jokers)
+	if jokers {
+		num_jokers := h.hand[rune('J')]
+		return num_jokers+max_count == 4
+
+	} else {
+		return max_count == 4
+	}
+}
+
+// Test if we can get a Full House
+func is_full_house(h hand_bid, jokers bool) bool {
+	max_count := do_max_count(h.hand, jokers)
+	if jokers {
+		num_jokers := h.hand[rune('J')]
+		// 1st possiblity: 3 of kind, 2 of kind, no jokers
+		if num_jokers == 0 {
+			found_3 := false
+			found_2 := false
+			for _, val := range h.hand {
+				found_3 = val == 3
+				found_2 = val == 2
+			}
+			return found_3 && found_2
+		} else if num_jokers == 1 {
+			// 2nd possibility: 2 pairs and 1 joker
+			num_twos := 0
+			for _, val := range h.hand {
+				if val == 2 {
+					num_twos += 1
+				}
+			}
+			return num_twos == 2
+		}
+		return false
+	} else {
+		if max_count == 3 {
+			for _, v := range h.hand {
+				if v == 2 {
+					return true
+				}
+			}
+			return false
+		}
+		return false
+	}
+}
+
+// Takes a hand and finds determine its type, i.e. 5 of a kind, 4 of a kind etc.
+func find_hand_type(h hand_bid, jokers bool) (hand_type, error) {
+	max_count := do_max_count(h.hand, jokers)
 	for _, v := range h.hand {
-		// fmt.Printf("hand_type: %c - %d\n", k, v)
 		if v > max_count {
 			max_count = v
 		}
 	}
 	switch max_count {
 	case 5:
-		return five_of_kind
+		return five_of_kind, nil
 	case 4:
-		return four_of_kind
+		return four_of_kind, nil
 	case 3:
 		// If we have 3 identical card we need to re-check if it's a full house or 3-of-kind
 		for _, v := range h.hand {
 			if v == 2 {
-				return full_house
+				return full_house, nil
 			}
 		}
-		return three_of_kind
+		return three_of_kind, nil
 	case 2:
 		// If max of type is 2, we need to check for another pair
 		rune_first_two := '0'
@@ -103,25 +188,26 @@ func find_hand_type(h hand_bid) hand_type {
 		// h.Display()
 		// fmt.Printf("First pair: %c\tSecond pair: %c\n", rune_first_two, rune_second_two)
 		if rune_second_two == '0' {
-			return one_pair
+			return one_pair, nil
 		} else {
-			return two_pair
+			return two_pair, nil
 		}
 	case 1:
-		return high_card
+		return high_card, nil
 	}
-	return invalid
+	error_str := fmt.Sprintf("Could not find hand type for %s\n", h.cards)
+	return invalid, errors.New(error_str)
 }
 
 // Basic bubble sort that works on an array of ints
-func bubble_sort(hands map[int]hand_bid, order *[]int) {
+func bubble_sort(hands map[int]hand_bid, order *[]int, jokers bool) {
 	N := len(*order)
 	// count_sort := 0
 	for {
 		swapped := false
 
 		for ix := 1; ix < N; ix++ {
-			cmp, err := greater_than(hands[(*order)[ix-1]], hands[(*order)[ix]])
+			cmp, err := greater_than(hands[(*order)[ix-1]], hands[(*order)[ix]], jokers)
 
 			if err != nil {
 				log.Fatal(err)
@@ -173,34 +259,15 @@ func main() {
 		all_hands_bids[ix_line] = this_hand_bid
 		ix_line += 1
 
-		// if ix_line > 10 {
-		// 	break
-		// }
 	}
 
-	// // After parsing all hands, try pair-wise comparison
-	// for ix_card := 0; ix_card < 10; ix_card += 2 {
-	// 	comparison, err := greater_than(all_hands_bids[ix_card], all_hands_bids[ix_card+1])
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// 	fmt.Printf("================================================\n")
-	// 	all_hands_bids[ix_card].Display()
-	// 	all_hands_bids[ix_card+1].Display()
-	// 	fmt.Printf("hand type 1 = %d, hand_type 2 = %d, hand 1 >= hand 2 = %v\n", find_hand_type(all_hands_bids[ix_card]), find_hand_type(all_hands_bids[ix_card+1]), comparison)
-	// }
-	// order := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 	// Initialize ordering of all cards
 	order := make([]int, 1000)
 	for ix := 0; ix < len(order); ix++ {
 		order[ix] = ix
 	}
 
-	bubble_sort(all_hands_bids, &order)
-	// for ix := 0; ix < len(order); ix++ {
-	// 	this_hand := all_hands_bids[order[ix]]
-	// 	fmt.Printf("%d - Hand: %s, hand_value = %d\n", ix, this_hand.cards, find_hand_type(this_hand))
-	// }
+	bubble_sort(all_hands_bids, &order, false)
 
 	weighted_sum := 0
 	for ix := 0; ix < len(order); ix++ {
@@ -211,5 +278,4 @@ func main() {
 
 	// 251362095 -- too high
 	// 249638405 -- correct answer :D
-
 }
