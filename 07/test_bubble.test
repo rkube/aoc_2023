@@ -1,28 +1,28 @@
-// package bubble
+package main
 
-// import (
-// 	"fmt"
-// )
+import (
+	"testing"
+)
 
-// func bubble_sort(vals *[]int) {
-// 	N := len(*vals)
-// 	for {
-// 		swapped := false
+func Test_bubble_sort(t *testing.T) {
+	// N := len(*vals)
+	// for {
+	// 	swapped := false
 
-// 		for ix := 1; ix < N; ix++ {
-// 			if (*vals)[ix-1] > (*vals)[ix] {
-// 				tmp := (*vals)[ix]
-// 				(*vals)[ix] = (*vals)[ix-1]
-// 				(*vals)[ix-1] = tmp
-// 				swapped = true
-// 				fmt.Printf("swapped %d/%d\n", (*vals)[ix-1], (*vals)[ix])
-// 			}
-// 		}
-// 		if swapped == false {
-// 			break
-// 		}
-// 	}
-// }
+	// 	for ix := 1; ix < N; ix++ {
+	// 		if (*vals)[ix-1] > (*vals)[ix] {
+	// 			tmp := (*vals)[ix]
+	// 			(*vals)[ix] = (*vals)[ix-1]
+	// 			(*vals)[ix-1] = tmp
+	// 			swapped = true
+	// 			fmt.Printf("swapped %d/%d\n", (*vals)[ix-1], (*vals)[ix])
+	// 		}
+	// 	}
+	// 	if swapped == false {
+	// 		break
+	// 	}
+	// }
+}
 
 // func test(vals *[]int) {
 // 	tmp := (*vals)[0]

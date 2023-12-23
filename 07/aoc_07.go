@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -27,7 +26,7 @@ const (
 
 // Maps card face values to numerical values for comparison
 func get_card_values() map[rune]int {
-	card_values := map[rune]int{'2': 0, '3': 1, '4': 2, '5': 3, '6': 4, '7': 5, '8': 6, '9': 7, 'T': 8, 'J': 9, 'K': 10, 'A': 11}
+	card_values := map[rune]int{'2': 0, '3': 1, '4': 2, '5': 3, '6': 4, '7': 5, '8': 6, '9': 7, 'T': 8, 'J': 9, 'Q': 10, 'K': 11, 'A': 12}
 	return card_values
 }
 
@@ -114,45 +113,6 @@ func find_hand_type(h hand_bid) hand_type {
 	return invalid
 }
 
-// Returns true of lhs > rhs, using the second rule
-// Parse cards in both hands sequentially. If the card in the
-// first hand is greater than the card second hand, return true
-func greater_than_o2(lhs hand_bid, rhs hand_bid) (bool, error) {
-	card_values := get_card_values()
-	for ix_c := 0; ix_c < 4; ix_c++ {
-		lhs_card := rune(lhs.cards[ix_c])
-		rhs_card := rune(rhs.cards[ix_c])
-		if card_values[lhs_card] > card_values[rhs_card] {
-			return true, nil
-		} else if card_values[lhs_card] < card_values[rhs_card] {
-			return false, nil
-		} else {
-			continue
-		}
-	}
-	error_str := fmt.Sprintf("Hands are identical: %s - %s\n", lhs.cards, rhs.cards)
-	return false, errors.New(error_str)
-}
-
-// Returns true of lhs > rhs
-// Compare first by hand_type
-// If hand types are equal, compare cards in order
-func greater_than(lhs hand_bid, rhs hand_bid) (bool, error) {
-	if find_hand_type(lhs) > find_hand_type(rhs) {
-		return true, nil
-	} else if find_hand_type(lhs) == find_hand_type(rhs) {
-		geq, err := greater_than_o2(lhs, rhs)
-		if err != nil {
-			log.Fatal(err)
-		}
-		return geq, nil
-	} else if find_hand_type(lhs) < find_hand_type(rhs) {
-		return false, nil
-	}
-	error_str := fmt.Sprintf("Hands are identical: %s - %s\n", lhs.cards, rhs.cards)
-	return false, errors.New(error_str)
-}
-
 // Basic bubble sort that works on an array of ints
 func bubble_sort(hands map[int]hand_bid, order *[]int) {
 	N := len(*order)
@@ -173,19 +133,10 @@ func bubble_sort(hands map[int]hand_bid, order *[]int) {
 				(*order)[ix-1] = tmp
 				swapped = true
 			}
-			// if (*vals)[ix-1] > (*vals)[ix] {
-			// 	tmp := (*vals)[ix]
-			// 	(*vals)[ix] = (*vals)[ix-1]
-			// 	(*vals)[ix-1] = tmp
-			// 	swapped = true
-			// 	fmt.Printf("swapped %d/%d\n", (*vals)[ix-1], (*vals)[ix])
-			// }
 		}
 		if swapped == false {
 			break
 		}
-		// count_sort += 1
-		// fmt.Printf("Sorted %d times\n", count_sort)
 	}
 }
 
@@ -217,7 +168,7 @@ func main() {
 		// fmt.Printf("bid: %d\n hand:\n", this_hand_bid.bid)
 		// this_hand_bid.Display()
 		// c := find_hand_type(this_hand_bid)
-		fmt.Printf("hand_type = %d\n", c)
+		// fmt.Printf("hand_type = %d\n", c)
 
 		all_hands_bids[ix_line] = this_hand_bid
 		ix_line += 1
@@ -250,5 +201,15 @@ func main() {
 	// 	this_hand := all_hands_bids[order[ix]]
 	// 	fmt.Printf("%d - Hand: %s, hand_value = %d\n", ix, this_hand.cards, find_hand_type(this_hand))
 	// }
+
+	weighted_sum := 0
+	for ix := 0; ix < len(order); ix++ {
+		weighted_sum += all_hands_bids[order[ix]].bid * (ix + 1)
+		fmt.Printf("Hand: %s Bid: %d, order: %d\n", all_hands_bids[order[ix]].cards, all_hands_bids[order[ix]].bid, ix)
+	}
+	fmt.Printf("Sum of bids, weighted by order: %d\n", weighted_sum)
+
+	// 251362095 -- too high
+	// 249638405 -- correct answer :D
 
 }
