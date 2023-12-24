@@ -84,5 +84,5 @@ func main() {
 	// The total number of steps is the number of times we had to
 	// iterate over the entire sequence of steps to come to ZZZ
 	// multiplied by the length of that sequence.
-	fmt.Printf("Number of steps: %d\n", iterations*len(directions))
+	fmt.Printf("Number of steps: %d - Correct answer: %d\n", iterations*len(directions), 19631)
 }
