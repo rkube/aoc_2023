@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"log"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -22,29 +24,24 @@ func parse_line(line string) []int {
 	return int_array
 }
 
-// Write a recursive function that calculates the difference between arrays.
-// Return if all differences are zero
-
-func calc_differences(array []int) int {
-	// Return 0 if the sum of the array is zero
-	sum := 0
-	for _, v := range array {
-		sum += v
-	}
-	if sum == 0 {
-		return sum
-	} else {
-
-	}
-
-}
-
 func main() {
 	fmt.Printf("Advent of code 2023 - Part 09\n")
 
-	// Hard-code some test example first
-	//
-	line_str := "0 3 6 9 12 15"
-	line_int := parse_line(line_str)
+	f, err := os.Open("input_09")
+	if err != nil {
+		log.Fatal(err)
+	}
+	scanner := bufio.NewScanner(f)
+	sum_part1 := 0
+	sum_part2 := 0
+	for scanner.Scan() {
+		current_line := scanner.Text()
+		line_ints := parse_line(current_line)
+		sum_part1 += calc_differences(line_ints)
+		sum_part2 += calc_differences_2(line_ints)
+	}
+
+	fmt.Printf("Part 1 - %d\n", sum_part1)
+	fmt.Printf("Part 1 - %d\n", sum_part2)
 
 }
