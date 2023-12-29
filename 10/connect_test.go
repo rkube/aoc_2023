@@ -67,3 +67,65 @@ func Test_maze_step(t *testing.T) {
 		curr_pos = next_pos
 	}
 }
+
+func Test_print_maze(t *testing.T) {
+	fmt.Printf("================================================================\n")
+	fmt.Printf("      Maze filling\n")
+	fmt.Printf("================================================================\n")
+	fmt.Printf("\n\n")
+
+	len := 23
+	maze, curr_pos := setup_maze("input_10_ex3", len)
+	trace_arr := make([]byte, len*len)
+
+	// Initialize the tracing array with all '.' for readability
+	for ix, _ := range trace_arr {
+		trace_arr[ix] = '.'
+	}
+	// for iy := 0; iy < len; iy++ {
+	// 	for ix := 0; ix < len; ix++ {
+	// 		fmt.Printf("%c", trace_arr[iy*len+ix])
+	// 	}
+	// 	fmt.Printf("\n")
+	// }
+
+	// Traverse the maze, mark visited elements withh O
+	prev_pos := curr_pos
+	// next_pos := curr_pos
+
+	trace_arr[curr_pos.y*len+curr_pos.x] = '7' // maze[curr_pos.y][curr_pos.x]
+	for {
+		// fmt.Printf("----------- Step ----------\n")
+		next_pos, err := maze_step(curr_pos, prev_pos, maze)
+		if err != nil {
+			log.Fatal(err)
+		}
+		// fmt.Printf("New node: [%02d, %02d]: %c (%d)\n", next_pos.x, next_pos.y, next_pos.pipe, next_pos.distance)
+		// Step
+		if next_pos.pipe == 'S' {
+			break
+		}
+		prev_pos = curr_pos
+		curr_pos = next_pos
+		trace_arr[curr_pos.y*len+curr_pos.x] = maze[curr_pos.y][curr_pos.x]
+	}
+
+	for iy := 0; iy < len; iy++ {
+		for ix := 0; ix < len; ix++ {
+			fmt.Printf("%c", trace_arr[iy*len+ix])
+		}
+		fmt.Printf("\t%s\n", maze[iy])
+		// fmt.Printf("\n")
+	}
+
+	I_total := 0
+	O_total := 0
+	for iy := 0; iy < len; iy++ {
+		_, I_line, O_line := ray_casting(trace_arr[iy*len : (iy+1)*len-1])
+		I_total += I_line
+		O_total += O_line
+	}
+
+	fmt.Printf("Internal area: %d\n", I_total)
+
+}
