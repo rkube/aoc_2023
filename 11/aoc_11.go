@@ -60,7 +60,7 @@ func duplicate_row(chart []byte, nrow int, ncol int, duplicate_rows []int) []byt
 		for _, v := range duplicate_rows {
 			// We have to check if the current original row needs to be duplicated.
 			if ix_row == v {
-				fmt.Printf("Duplicating: ix_row = %d -> ix_new_row = %d\n", ix_row, ix_new_row)
+				// fmt.Printf("Duplicating: ix_row = %d -> ix_new_row = %d\n", ix_row, ix_new_row)
 				ix_new_row += 1
 				for ix_col := 0; ix_col < ncol; ix_col++ {
 					new_chart[ix_new_row*ncol+ix_col] = chart[ix_row*ncol+ix_col]
