@@ -120,13 +120,27 @@ func Test_galaxy_dist(t *testing.T) {
 		fmt.Printf("%d: [%02d,%02d]\n", g.id, g.row, g.col)
 	}
 
-	ix1, ix2 := 4, 8
-	fmt.Printf("Distance %d [%02d,%02d] - %d [%02d,%02d] %d\n", galaxy_coords[ix1].id, galaxy_coords[ix1].row, galaxy_coords[ix1].col, galaxy_coords[ix2].id, galaxy_coords[ix2].row, galaxy_coords[ix2].col, mahattan_dist(galaxy_coords[ix1], galaxy_coords[ix2]))
-	ix1, ix2 = 0, 6
-	fmt.Printf("Distance %d [%02d,%02d] - %d [%02d,%02d] %d\n", galaxy_coords[ix1].id, galaxy_coords[ix1].row, galaxy_coords[ix1].col, galaxy_coords[ix2].id, galaxy_coords[ix2].row, galaxy_coords[ix2].col, mahattan_dist(galaxy_coords[ix1], galaxy_coords[ix2]))
-	ix1, ix2 = 2, 5
-	fmt.Printf("Distance %d [%02d,%02d] - %d [%02d,%02d] %d\n", galaxy_coords[ix1].id, galaxy_coords[ix1].row, galaxy_coords[ix1].col, galaxy_coords[ix2].id, galaxy_coords[ix2].row, galaxy_coords[ix2].col, mahattan_dist(galaxy_coords[ix1], galaxy_coords[ix2]))
-	ix1, ix2 = 7, 8
-	fmt.Printf("Distance %d [%02d,%02d] - %d [%02d,%02d] %d\n", galaxy_coords[ix1].id, galaxy_coords[ix1].row, galaxy_coords[ix1].col, galaxy_coords[ix2].id, galaxy_coords[ix2].row, galaxy_coords[ix2].col, mahattan_dist(galaxy_coords[ix1], galaxy_coords[ix2]))
+	ix1, ix2, true_d := 4, 8, 9
+	// fmt.Printf("Distance %d [%02d,%02d] - %d [%02d,%02d] %d\n", galaxy_coords[ix1].id, galaxy_coords[ix1].row, galaxy_coords[ix1].col, galaxy_coords[ix2].id, galaxy_coords[ix2].row, galaxy_coords[ix2].col, mahattan_dist(galaxy_coords[ix1], galaxy_coords[ix2]))
+	if mahattan_dist(galaxy_coords[ix1], galaxy_coords[ix2]) != true_d {
+		t.Fatalf("Mismatch: Distance(%d [%02d,%02d], %d [%02d,%02d]) = %d but should be %d\n", galaxy_coords[ix1].id, galaxy_coords[ix1].row, galaxy_coords[ix1].col, galaxy_coords[ix2].id, galaxy_coords[ix2].row, galaxy_coords[ix2].col, mahattan_dist(galaxy_coords[ix1], galaxy_coords[ix2]), true_d)
+	}
+	ix1, ix2, true_d = 0, 6, 15
+	// fmt.Printf("Distance %d [%02d,%02d] - %d [%02d,%02d] %d\n", galaxy_coords[ix1].id, galaxy_coords[ix1].row, galaxy_coords[ix1].col, galaxy_coords[ix2].id, galaxy_coords[ix2].row, galaxy_coords[ix2].col, mahattan_dist(galaxy_coords[ix1], galaxy_coords[ix2]))
+	if mahattan_dist(galaxy_coords[ix1], galaxy_coords[ix2]) != true_d {
+		t.Fatalf("Mismatch: Distance(%d [%02d,%02d], %d [%02d,%02d]) = %d but should be %d\n", galaxy_coords[ix1].id, galaxy_coords[ix1].row, galaxy_coords[ix1].col, galaxy_coords[ix2].id, galaxy_coords[ix2].row, galaxy_coords[ix2].col, mahattan_dist(galaxy_coords[ix1], galaxy_coords[ix2]), true_d)
+	}
+
+	ix1, ix2, true_d = 2, 5, 17
+	// fmt.Printf("Distance %d [%02d,%02d] - %d [%02d,%02d] %d\n", galaxy_coords[ix1].id, galaxy_coords[ix1].row, galaxy_coords[ix1].col, galaxy_coords[ix2].id, galaxy_coords[ix2].row, galaxy_coords[ix2].col, mahattan_dist(galaxy_coords[ix1], galaxy_coords[ix2]))
+	if mahattan_dist(galaxy_coords[ix1], galaxy_coords[ix2]) != true_d {
+		t.Fatalf("Mismatch: Distance(%d [%02d,%02d], %d [%02d,%02d]) = %d but should be %d\n", galaxy_coords[ix1].id, galaxy_coords[ix1].row, galaxy_coords[ix1].col, galaxy_coords[ix2].id, galaxy_coords[ix2].row, galaxy_coords[ix2].col, mahattan_dist(galaxy_coords[ix1], galaxy_coords[ix2]), true_d)
+	}
+
+	ix1, ix2, true_d = 7, 8, 5
+	// fmt.Printf("Distance %d [%02d,%02d] - %d [%02d,%02d] %d\n", galaxy_coords[ix1].id, galaxy_coords[ix1].row, galaxy_coords[ix1].col, galaxy_coords[ix2].id, galaxy_coords[ix2].row, galaxy_coords[ix2].col, mahattan_dist(galaxy_coords[ix1], galaxy_coords[ix2]))
+	if mahattan_dist(galaxy_coords[ix1], galaxy_coords[ix2]) != true_d {
+		t.Fatalf("Mismatch: Distance(%d [%02d,%02d], %d [%02d,%02d]) = %d but should be %d\n", galaxy_coords[ix1].id, galaxy_coords[ix1].row, galaxy_coords[ix1].col, galaxy_coords[ix2].id, galaxy_coords[ix2].row, galaxy_coords[ix2].col, mahattan_dist(galaxy_coords[ix1], galaxy_coords[ix2]), true_d)
+	}
 
 }
