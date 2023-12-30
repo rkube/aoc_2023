@@ -7,6 +7,19 @@ import (
 	"os"
 )
 
+type coords_t struct {
+	row int
+	col int
+	id  int
+}
+
+func Abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
+
 // Returns a number of rows that don't contain a galaxy (#)
 func find_empty_rows(chart []byte, nrow int, ncol int) []int {
 	empty_rows := []int{}
@@ -115,6 +128,24 @@ func load_map(filename string, nrow int, ncol int) []byte {
 	}
 
 	return chart
+}
+
+func galaxy_pos(chart []byte, nrow int, ncol int) []coords_t {
+	galaxy_coords := []coords_t{}
+	galaxy_count := 0
+	for ix_row := 0; ix_row < nrow; ix_row++ {
+		for ix_col := 0; ix_col < ncol; ix_col++ {
+			if chart[ix_row*ncol+ix_col] == '#' {
+				galaxy_coords = append(galaxy_coords, coords_t{row: ix_row, col: ix_col, id: galaxy_count})
+				galaxy_count += 1
+			}
+		}
+	}
+	return galaxy_coords
+}
+
+func mahattan_dist(g1 coords_t, g2 coords_t) int {
+	return Abs(g1.col-g2.col) + Abs(g1.row-g2.row)
 }
 
 func main() {

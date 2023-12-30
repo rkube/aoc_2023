@@ -100,3 +100,33 @@ func Test_expand_array(t *testing.T) {
 	}
 
 }
+
+func Test_galaxy_dist(t *testing.T) {
+	fmt.Printf("\n\n--------- Expanding arrays --------\n\n")
+	nrow, ncol := 10, 10
+	chart := load_map("input_11_test1", nrow, ncol)
+	empty_rows := find_empty_rows(chart, nrow, ncol)
+	empty_cols := find_empty_cols(chart, nrow, ncol)
+	new_nrow := nrow + len(empty_rows)
+	new_ncol := ncol + len(empty_cols)
+
+	chart_exp_rows := duplicate_row(chart, nrow, ncol, empty_rows)
+	chart_exp := duplicate_col(chart_exp_rows, new_nrow, ncol, empty_cols)
+
+	galaxy_coords := galaxy_pos(chart_exp, new_nrow, new_ncol)
+
+	fmt.Printf("Found %d galaxies:\n", len(galaxy_coords))
+	for _, g := range galaxy_coords {
+		fmt.Printf("%d: [%02d,%02d]\n", g.id, g.row, g.col)
+	}
+
+	ix1, ix2 := 4, 8
+	fmt.Printf("Distance %d [%02d,%02d] - %d [%02d,%02d] %d\n", galaxy_coords[ix1].id, galaxy_coords[ix1].row, galaxy_coords[ix1].col, galaxy_coords[ix2].id, galaxy_coords[ix2].row, galaxy_coords[ix2].col, mahattan_dist(galaxy_coords[ix1], galaxy_coords[ix2]))
+	ix1, ix2 = 0, 6
+	fmt.Printf("Distance %d [%02d,%02d] - %d [%02d,%02d] %d\n", galaxy_coords[ix1].id, galaxy_coords[ix1].row, galaxy_coords[ix1].col, galaxy_coords[ix2].id, galaxy_coords[ix2].row, galaxy_coords[ix2].col, mahattan_dist(galaxy_coords[ix1], galaxy_coords[ix2]))
+	ix1, ix2 = 2, 5
+	fmt.Printf("Distance %d [%02d,%02d] - %d [%02d,%02d] %d\n", galaxy_coords[ix1].id, galaxy_coords[ix1].row, galaxy_coords[ix1].col, galaxy_coords[ix2].id, galaxy_coords[ix2].row, galaxy_coords[ix2].col, mahattan_dist(galaxy_coords[ix1], galaxy_coords[ix2]))
+	ix1, ix2 = 7, 8
+	fmt.Printf("Distance %d [%02d,%02d] - %d [%02d,%02d] %d\n", galaxy_coords[ix1].id, galaxy_coords[ix1].row, galaxy_coords[ix1].col, galaxy_coords[ix2].id, galaxy_coords[ix2].row, galaxy_coords[ix2].col, mahattan_dist(galaxy_coords[ix1], galaxy_coords[ix2]))
+
+}
