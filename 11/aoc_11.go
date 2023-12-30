@@ -109,7 +109,7 @@ func load_map(filename string, nrow int, ncol int) []byte {
 	for scanner.Scan() {
 		current_line := scanner.Text()
 		for ix_col := 0; ix_col < ncol; ix_col++ {
-			chart[ix_row*nrow+ix_col] = current_line[ix_col]
+			chart[ix_row*ncol+ix_col] = current_line[ix_col]
 		}
 		ix_row += 1
 	}
