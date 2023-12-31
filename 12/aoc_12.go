@@ -142,6 +142,20 @@ func parse_line(line string) (string, []int) {
 	return expr, counts
 }
 
+func parse_line_part2(line string) (string, []int) {
+	expr, counts := parse_line(line)
+
+	expr_v2 := fmt.Sprintf("%s?%s?%s?%s?%s", expr, expr, expr, expr, expr)
+	counts_v2 := make([]int, 5*len(counts))
+
+	for ix_r := 0; ix_r < 5; ix_r++ {
+		for ix_c := 0; ix_c < len(counts); ix_c++ {
+			counts_v2[ix_r*len(counts)+ix_c] = counts[ix_c]
+		}
+	}
+	return expr_v2, counts_v2
+}
+
 func main() {
 	fmt.Printf("Advent of Code 2023 - Day 12\n")
 
@@ -153,16 +167,17 @@ func main() {
 	scanner := bufio.NewScanner(f)
 
 	sum := 0
+	sum_part2 := 0
 	for scanner.Scan() {
 		current_line := scanner.Text()
 		expr, counts := parse_line(current_line)
-		// fmt.Printf("%s: ", expr)
-		// for _, c := range counts {
-		// 	fmt.Printf("%d, ", c)
-		// }
-		// fmt.Printf("\n")
+
+		expr_2, counts_2 := parse_line_part2(current_line)
+
 		sum += count_arrangements(expr, counts)
+		sum_part2 += count_arrangements(expr_2, counts_2)
 	}
 
 	fmt.Printf("Part 1: sum = %d\n", sum)
+	fmt.Printf("Part 2: sum = %d\n", sum_part2)
 }
