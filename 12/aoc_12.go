@@ -152,14 +152,17 @@ func main() {
 	defer f.Close()
 	scanner := bufio.NewScanner(f)
 
+	sum := 0
 	for scanner.Scan() {
 		current_line := scanner.Text()
 		expr, counts := parse_line(current_line)
-		fmt.Printf("%s: ", expr)
-		for _, c := range counts {
-			fmt.Printf("%d, ", c)
-		}
-		fmt.Printf("\n")
+		// fmt.Printf("%s: ", expr)
+		// for _, c := range counts {
+		// 	fmt.Printf("%d, ", c)
+		// }
+		// fmt.Printf("\n")
+		sum += count_arrangements(expr, counts)
 	}
 
+	fmt.Printf("Part 1: sum = %d\n", sum)
 }
