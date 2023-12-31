@@ -16,21 +16,17 @@ type matrix_t struct {
 // Tranpose memory layout of the matrix
 func transpose(m matrix_t) matrix_t {
 
-	data_tr := make([]byte, m.nrows*m.ncols)
-	fmt.Printf("len(data_tr)= %d\n", len(data_tr))
+	// data_tr := make([]byte, m.nrows*m.ncols)
+	// fmt.Printf("len(data_tr)= %d\n", len(data_tr))
+
+	m_t := matrix_t{nrows: m.ncols, ncols: m.nrows, data: make([]byte, m.nrows*m.ncols)}
 	for ix_row := 0; ix_row < m.nrows; ix_row++ {
 		for ix_col := 0; ix_col < m.ncols; ix_col++ {
 			// fmt.Printf("Original: ix_row * m.ncols + ix_col= %d\n", ix_row*m.ncols+ix_col)
 			// fmt.Printf("Transposed:ix_col * m.ncols + ix_row = %d\n", ix_col*m.nrows+ix_row)
-			data_tr[ix_col*m.nrows+ix_row] = m.data[ix_row*m.ncols+ix_col]
+			m_t.data[ix_col*m.nrows+ix_row] = m.data[ix_row*m.ncols+ix_col]
 		}
 	}
-	m_t := matrix_t{nrows: m.ncols, ncols: m.nrows, data: data_tr}
-	// for ix_col := 0; ix_col < m_t.ncols; ix_col++ {
-	// 	for ix_row := 0; ix_row < m_t.nrows; ix_row++ {
-	// 		m_t.data[ix_col*m_t.nrows+ix_row] = (byte)(10*ix_col + ix_row)
-	// 	}
-	// }
 	return m_t
 }
 
