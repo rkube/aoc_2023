@@ -33,10 +33,10 @@ func transpose(m matrix_t) matrix_t {
 // Returns the number of columns to the left of the reflection line.
 // If there is no reflection line, return -1
 func find_vertical_reflection(m matrix_t) int {
-	fmt.Println(m.data)
+	// fmt.Println(m.data)
 
-	fmt.Printf("Vertical reflection")
-	fmt.Printf("Matrix: nrows=%d, ncols=%d\n", m.nrows, m.ncols)
+	// fmt.Printf("----find_vertical_reflection----\n")
+	// fmt.Printf("Matrix: nrows=%d, ncols=%d\n", m.nrows, m.ncols)
 
 	// Start after the first column.
 	// Iterate rows simultanously, to the left and to the right.
@@ -46,7 +46,7 @@ func find_vertical_reflection(m matrix_t) int {
 	ix_reflection := -1
 
 	for col_start := 0; col_start < m.ncols-1; col_start++ {
-		fmt.Printf("Starting at col %d\n", col_start)
+		// fmt.Printf("Starting at col %d\n", col_start)
 
 		// If we can exhaust the iteration with all identical columns, we found a reflection:
 		columns_identical := true
@@ -59,7 +59,7 @@ func find_vertical_reflection(m matrix_t) int {
 			}
 			// fmt.Printf("Columns [%d, %d] identical: %v\n", col_l, col_r, columns_identical)
 		}
-		fmt.Printf("Iteration start: %d, columns identical: %v\n", col_start, columns_identical)
+		// fmt.Printf("Iteration start: %d, columns identical: %v\n", col_start, columns_identical)
 		if columns_identical {
 			ix_reflection = col_start
 		}
@@ -67,32 +67,6 @@ func find_vertical_reflection(m matrix_t) int {
 
 	return ix_reflection + 1 // Move from 0-based to 1-based indexing
 }
-
-// func find_horizontal_reflection(m matrix_t) int {
-// 	ix_reflection := -1
-
-// 	for row_start := 0; row_start < m.nrows-1; row_start++ {
-// 		fmt.Printf("Starting at row %d\n", row_start)
-
-// 		// If we can exhaust the iteration with all identical columns, we found a reflection:
-// 		rows_identical := true
-// 		for row_l, row_r := row_start, row_start+1; row_l >= 0 && row_r < m.ncols; row_l, row_r = row_l-1, row_r+1 {
-// 			// Check if columns it_left and it_right are identical
-// 			for ix_row := 0; ix_row < m.nrows; ix_row++ {
-// 				columns_identical = columns_identical && (m.data[ix_row*m.ncols+col_l] == m.data[ix_row*m.ncols+col_r])
-// 				// fmt.Printf("%c %c\n", m.data[ix_row*m.ncols+col_l], m.data[ix_row*m.ncols+col_r])
-// 				// m[ix_row * m.ncols + ]
-// 			}
-// 			// fmt.Printf("Columns [%d, %d] identical: %v\n", col_l, col_r, columns_identical)
-// 		}
-// 		fmt.Printf("Iteration start: %d, columns identical: %v\n", col_start, columns_identical)
-// 		if columns_identical {
-// 			ix_reflection = col_start
-// 		}
-// 	}
-
-// 	return ix_reflection + 1 // Move from 0-based to 1-based indexing
-// }
 
 // Parses the input file and returns a slice of matrices
 func parse_file(filename string) []matrix_t {
@@ -113,6 +87,7 @@ func parse_file(filename string) []matrix_t {
 		if len(current_line) == 0 {
 			// Append the current matrix
 			arrays = append(arrays, matrix_t{data: new_matrix, nrows: row_count, ncols: this_N})
+			new_matrix = []byte{}
 
 			this_N = 0
 			row_count = 0
@@ -140,10 +115,29 @@ func parse_file(filename string) []matrix_t {
 
 func main() {
 	fmt.Printf("----- Advent of Code - day 13 -----\n")
-	matrices := parse_file("input_13_test")
+	matrices := parse_file("input_13")
 
+	// for ix_m, m := range matrices {
+	// 	fmt.Printf("Matrix %02d: nrows: %02d, ncols: %02d\n", ix_m, m.nrows, m.ncols)
+	// }
+
+	sum_part1 := 0
 	for ix_m, m := range matrices {
-		fmt.Printf("Matrix %02d: nrows: %02d, ncols: %02d\n", ix_m, m.nrows, m.ncols)
+		// Calculate transposed matrix:
+		m_t := transpose(m)
+		// Try finding vertical (row-wise) and horizontal symmetry line
+		sym_row := find_vertical_reflection(m)
+		sym_col := find_vertical_reflection(m_t)
+
+		if (sym_row == 0) && (sym_col != 0) {
+			sum_part1 += 100 * sym_col
+		} else if (sym_row != 0) && (sym_col == 0) {
+			sum_part1 += sym_row
+		} else {
+			err_msg := fmt.Sprintf("Matrix %d: sym_row = %d and sym_col =%d\n", ix_m, sym_row, sym_col)
+			log.Fatal(err_msg)
+		}
 	}
+	fmt.Printf("Part 1: %d\n", sum_part1)
 
 }
