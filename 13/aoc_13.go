@@ -68,6 +68,46 @@ func find_vertical_reflection(m matrix_t) int {
 	return ix_reflection + 1 // Move from 0-based to 1-based indexing
 }
 
+func find_vertical_reflection_2(m matrix_t) int {
+	// Start after the first column.
+	// Iterate rows simultanously, to the left and to the right.
+	// As long as they are identical, keep iterating.
+	// If one of the iterators goes out-of-bounds, we have found a pattern
+
+	ix_reflection := -1
+	// ix_diff := -1
+
+	for col_start := 0; col_start < m.ncols-1; col_start++ {
+		// fmt.Printf("Starting at col %d\n", col_start)
+
+		// If we can exhaust the iteration with all identical columns, we found a reflection:
+		// columns_identical := true
+		num_diff := 0
+		for col_l, col_r := col_start, col_start+1; col_l >= 0 && col_r < m.ncols; col_l, col_r = col_l-1, col_r+1 {
+			// Check if columns it_left and it_right are identical
+			for ix_row := 0; ix_row < m.nrows; ix_row++ {
+
+				// columns_identical = columns_identical && (m.data[ix_row*m.ncols+col_l] == m.data[ix_row*m.ncols+col_r])
+				if m.data[ix_row*m.ncols+col_l] != m.data[ix_row*m.ncols+col_r] {
+					num_diff += 1
+				}
+				// fmt.Printf("%c %c\n", m.data[ix_row*m.ncols+col_l], m.data[ix_row*m.ncols+col_r])
+				// m[ix_row * m.ncols + ]
+			}
+			// fmt.Printf("Columns [%d, %d] identical: %v\n", col_l, col_r, columns_identical)
+		}
+		// fmt.Printf("Iteration start: %d, columns identical: %v\n", col_start, columns_identical)
+		// if columns_identical {
+		// ix_reflection = col_start
+		// }
+		if num_diff == 1 {
+			ix_reflection = col_start
+		}
+	}
+
+	return ix_reflection + 1 // Move from 0-based to 1-based indexing
+}
+
 // Parses the input file and returns a slice of matrices
 func parse_file(filename string) []matrix_t {
 	arrays := []matrix_t{}
@@ -122,6 +162,7 @@ func main() {
 	// }
 
 	sum_part1 := 0
+	sum_part2 := 0
 	for ix_m, m := range matrices {
 		// Calculate transposed matrix:
 		m_t := transpose(m)
@@ -137,7 +178,22 @@ func main() {
 			err_msg := fmt.Sprintf("Matrix %d: sym_row = %d and sym_col =%d\n", ix_m, sym_row, sym_col)
 			log.Fatal(err_msg)
 		}
+
+		// Repeat fot part 2
+		sym_row_2 := find_vertical_reflection_2(m)
+		sym_col_2 := find_vertical_reflection_2(m_t)
+
+		if (sym_row_2 == 0) && (sym_col_2 != 0) {
+			sum_part2 += 100 * sym_col_2
+		} else if (sym_row_2 != 0) && (sym_col_2 == 0) {
+			sum_part2 += sym_row_2
+		} else {
+			err_msg := fmt.Sprintf("Matrix %d: sym_row = %d and sym_col =%d\n", ix_m, sym_row_2, sym_col_2)
+			log.Fatal(err_msg)
+		}
+
 	}
 	fmt.Printf("Part 1: %d\n", sum_part1)
+	fmt.Printf("Part 2: %d\n", sum_part2)
 
 }

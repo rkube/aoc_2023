@@ -64,3 +64,20 @@ func Test_transpose(t *testing.T) {
 	}
 
 }
+
+func Test_part1(t *testing.T) {
+	fmt.Printf("======= Testing iteration on part 2 ========\n")
+	matrices := parse_file("input_13_test")
+
+	answer_0_col := find_vertical_reflection_2(matrices[0])
+	answer_0_row := find_vertical_reflection_2(transpose(matrices[0]))
+	fmt.Printf("Matrix 0: vertical: %d\n", answer_0_col)
+	fmt.Printf("Matrix 0: horizontal: %d\n", answer_0_row)
+
+	answer_1_col := find_vertical_reflection_2(matrices[1])
+	answer_1_row := find_vertical_reflection_2(transpose(matrices[1]))
+
+	fmt.Printf("Matrix 1: vertical: %d\n", answer_1_col)
+	fmt.Printf("Matrix 1: horizontal: %d\n", answer_1_row)
+
+}
