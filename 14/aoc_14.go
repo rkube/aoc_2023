@@ -123,3 +123,15 @@ func score_row(pos_O []int, nrows int) int {
 	}
 	return sum_row
 }
+
+func main() {
+	m := parse_input("input_14")
+	score := 0
+	for ix_col := 0; ix_col < m.ncols; ix_col++ {
+		pos_S := search_col(m, '#', ix_col)
+		pos_O := search_col(m, 'O', ix_col)
+		sorted_Os := sort_Os(pos_O, pos_S, m.nrows)
+		score += score_row(sorted_Os, m.nrows)
+	}
+	fmt.Printf("Score: %d\n", score)
+}
